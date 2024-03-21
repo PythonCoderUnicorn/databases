@@ -1,0 +1,232 @@
+
+# MongoDB 
+
+brew update
+brew install mongodb-community@7.0
+brew services start mongodb/brew/mongodb-community
+
+brew services stop mongodb-community@7.0
+
+brew services restart mongodb-community
+
+
+
+mongosh --version  // 2.2.1
+use 'mongosh' to create, read, update, and delete (CRUD) items in your database.
+
+
+MongoDB uses collections instead of relations, has key:values  in Documents (can be nested)
+
+
+
+brew install mongodb-atlas
+atlas setup
+
+
+connects to MongoDB Atlas server 
+
+mongosh 
+the shell:  test>
+
+
+-------- collections & Documents
+
+[Users]  [Blog Posts]  [Comments]
+
+[Blog posts]
+  doc doc doc doc     
+
+doc is {JSON data}
+each doc has id 
+
+
+
+----- MongoDB browser
+create database
+  bookstore
+  books 
+
+  Database
+    bookstore
+      books          bookstore.books 
+
+      add data > insert document
+      {
+        "title": "book name",
+        "author": "author name",
+        "pages": 500
+        "genres": ["fantasy", "magical"],
+        "rating": 9
+      }
+      can copy & paste an array of data [ {}, {}, {} ]
+
+    filter: {rating: 9} --> apply 
+
+
+
+
+--------------- mongodb shell 
+
+show dbs            shows bookstore among other datasets 
+use bookstore       'switched to db bookstore'    use mydb (runs despite db does not exist)
+db                  prints current db 
+show collections
+var name ="yoshi"   store variable, name  
+var name ="peach"   update variable, name is now peach 
+help 
+show tables
+show Users
+exit | quit 
+print 
+cls                 clear screen 
+
+
+------ add collection in shell 
+use bookstore
+db.books              ==> bookstore.books 
+db.books.insertOne( {title: "The Great Mystery", author: "Dark Webster", pages: 367, rating: 7.8, genres: ["SciFi","History"]})
+
+
+(browser > refresh = shows up in DB )
+
+db.authors.insertOne({})     works even if authors collection does not exist 
+
+db.books.insertMany([ {}, {} ])
+
+
+{title: "", author:"", pages: 300, rating: 6, genres:["one","two"]}
+
+
+db.books.insertMany([ {title: "Beeps & Boops", author:"R2D2", pages: 300, rating: 6, genres:["SciFi","Robotics"]}, {title: "Warp Engines: Engineering Guide", author:"Chief Miles O'Brian", pages: 970, rating: 9.6, genres:["Textbook","Engineering"]} ] )
+
+
+------ fetch data 
+db.books.find()         returns first 20 results
+it k                      iterates k times 
+
+db.books.find( {author: "R2D2"} )
+
+db.books.insertOne( {title: "Warp Field Dynamics in Hyper Space", author: "Chief Miles O'Brien", pages: 1367, rating: 8.8, genres: ["Textbook","Engineering"]})
+
+db.books.find( {genres: "Engineering"} )     returns 2 books 
+
+db.books.find( {author: "Terry Practchett", rating: 7 } )   matches both conditions 
+
+-- get specific fields back 
+db.books.find( {author: "Chief Miles O'Brien" }, {title: 1, author: 1})
+
+db.books.find( {}, {title: 1, author: 1} )       returns just titles and authors 
+
+
+-- find book on field 
+db.books.findOne( {_id: ObjectId('65fc6170b266ec53ac9b5907')})      returns 'Warp Engines: Engineering Guide'
+
+
+--- count 
+db.books.countDocuments()
+db.books.find( {author: "Chief Miles O'Brien" } ).countDocuments()
+
+-- limit 
+db.books.find().limit(3)
+
+--- sort 
+db.books.find().sort({ title: 1 })       1= asc -1= desc
+
+db.books.find().sort({ title: 1 }).limit(3)
+
+
+--- nested documents 
+{ title: "", 
+  author:"", 
+  pages: 300, 
+  rating: 6, 
+  genres:["one","two"], 
+  reviews: [ {}, {}, {} ]
+}
+
+db.books.insertOne( {title: "Life Lessons from Bajor", author: "Benjamin Sisko", rating:7.8, pages:256, genres:["Biography","Spiritual","Non-Fiction"], reviews:[ {name:"Yoshi", body: "Great book"}, {name:"Mario", body:"it was okay"} ]} )
+db.books.insertMany( {}, {}, {})
+
+
+---- operators $  
+$gt | $lt | $gte | $lte
+db.books.find( {rating: {$gt: 7} })             returns all books >7 not inclusive to 7
+db.books.find( {rating: {$gt: 7} }).count()     10 
+db.books.find( {rating: {$lt: 7} })             returns all books <7 
+
+db.books.find( {rating: {$gt: 7}, author: "Chief Miles O'Brien" })
+
+-- OR 
+db.books.find( {$or: [ {rating: 7}, {rating: 9} ] })                         returns books with 9 rating
+db.books.find( { $or: [ {rating: 7}, {pages: {$lt: 600} } ] } )
+db.books.find( { $or: [ {rating: 7}, {pages: {$lt: 600} } ] } ).count()      returns 7 
+
+
+--- IN operator
+db.books.find( {rating: {$in: [7,8,9] }  } )
+db.books.find( {rating: {$nin: [7,8,9] }  } )            ratings not in array 
+db.books.find( {rating: {$nin: [7,8,9] }  } ).count()
+
+
+--- query arrays 
+db.books.find( {genres: "Engineering"})
+db.books.find( {genres: ["Engineering"] })    no results as array has no single "Engineering"
+db.books.find( {genres: "Biography" })
+db.books.find( {genres: ["fantasy", "magical"] })     returns 1 book 
+
+-- check array field 
+db.books.find( {genres: {$all: ["fantasy", "magical" ]} })
+
+--- query nested document for book reviews
+db.books.find( {"reviews.name": "Mario" } )
+
+
+(browser > export > select fields > output JSON | CSV > export )
+(Add Data > import file | insert document )
+
+
+--- delete document
+db.books.deleteOne( {_id: ObjectId('65fc5921ce836a5c88e7d103') })
+d.books.deleteMany( {author: ""} )
+
+
+
+---- updating document
+db.books.updateOne( { _id: ObjectId('65fc5921ce836a5c88e7d103') }, {$set: {rating: 8} } )
+db.books.updateOne( { _id: ObjectId('65fc5921ce836a5c88e7d103') }, {$set: {rating: 8, pages: 450} } )
+
+db.books.updateOne( {}, {$set {} })
+
+
+--- increment 
+db.books.updateOne( {_id: ObjectId('65fc5921ce836a5c88e7d103')} , {$inc: {pages: 2 }}) 
+db.books.updateOne( {_id: ObjectId('65fc5921ce836a5c88e7d103')} , {$inc: {pages: -2 }}) 
+
+--- push / pull values of array
+db.books.updateOne( {_id: ObjectId('65fc5921ce836a5c88e7d103')} , {$pull: {genres: "fantasy"}})
+db.books.updateOne( {_id: ObjectId('65fc5921ce836a5c88e7d103')} , {$push: {genres: "fantasy"}})
+
+--- updating document
+db.books.updateOne( {_id: ObjectId('65fc5921ce836a5c88e7d103')} , {$push: {genres: {$each: ["1","2"] } }})
+
+
+--- python driver for python based programs  etc
+
+
+
+================ nodejs app 
+npm init 
+npm install express 
+npm install nodemon | sudo npm install -g nodemon
+nodemon app
+
+http://localhost:3000/books
+
+npm install mongodb 
+
+
+https://learn.mongodb.com/pages/learners-journey
+https://learn.mongodb.com/learning-paths/using-mongodb-with-python
+https://learn.mongodb.com/learning-paths/introduction-to-mongodb
+https://learn.mongodb.com/learning-paths/mongodb-database-admin-self-managed-path
+

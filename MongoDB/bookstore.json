@@ -1,0 +1,42 @@
+[
+  {
+    "author": "J.R.R. Tolkien",
+    "pages": 1178,
+    "genres": ["Fantasy", "Adventure", "Epic"],
+    "rating": 10
+  },
+  {
+    "author": "George R.R. Martin",
+    "pages": 1168,
+    "genres": ["Fantasy", "Drama", "Epic"],
+    "rating": 9
+  },
+  {
+    "author": "Margaret Atwood",
+    "pages": 348,
+    "genres": ["Science Fiction", "Dystopian", "Feminist Fiction"],
+    "rating": 8.5
+  },
+  {
+    "author": "Harper Lee",
+    "pages": 324,
+    "genres": ["Fiction", "Coming-of-age", "Historical Fiction"],
+    "rating": 9.5
+  },
+  {
+    "author": "Gabriel Garcia Marquez",
+    "pages": 352,
+    "genres": ["Magical Realism", "Fiction", "Historical Fiction"],
+    "rating": 9.2
+  }
+]
+
+
+
+
+
+
+
+
+
+
